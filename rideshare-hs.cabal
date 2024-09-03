@@ -23,7 +23,6 @@ library
       Application
       Foundation
       Handler.Comment
-      Handler.Common
       Handler.Home
       Import
       Import.NoFoundation
