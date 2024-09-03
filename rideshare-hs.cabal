@@ -25,7 +25,6 @@ library
       Handler.Comment
       Handler.Common
       Handler.Home
-      Handler.Profile
       Import
       Import.NoFoundation
       Model
@@ -142,7 +141,6 @@ test-suite rideshare-hs-test
       Handler.CommentSpec
       Handler.CommonSpec
       Handler.HomeSpec
-      Handler.ProfileSpec
       TestImport
       Paths_rideshare_hs
   hs-source-dirs:

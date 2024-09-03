@@ -43,7 +43,7 @@ getBinDir, getLibDir, getDynLibDir, getDataDir, getLibexecDir, getSysconfDir :: 
 
 bindir, libdir, dynlibdir, datadir, libexecdir, sysconfdir :: FilePath
 bindir     = "/Users/zachtoolson/workspace/rideshare-hs/.stack-work/install/x86_64-osx/56d9f564a8a11aaccd1249048f17e58f7d40f09567fe7da28fd6c3f731028d3b/9.2.8/bin"
-libdir     = "/Users/zachtoolson/workspace/rideshare-hs/.stack-work/install/x86_64-osx/56d9f564a8a11aaccd1249048f17e58f7d40f09567fe7da28fd6c3f731028d3b/9.2.8/lib/x86_64-osx-ghc-9.2.8/rideshare-hs-0.0.0-8mdrVUiPRtQLSvUkR1TU9N"
+libdir     = "/Users/zachtoolson/workspace/rideshare-hs/.stack-work/install/x86_64-osx/56d9f564a8a11aaccd1249048f17e58f7d40f09567fe7da28fd6c3f731028d3b/9.2.8/lib/x86_64-osx-ghc-9.2.8/rideshare-hs-0.0.0-Fq5opIjRQGRBeu5nTR3Irw"
 dynlibdir  = "/Users/zachtoolson/workspace/rideshare-hs/.stack-work/install/x86_64-osx/56d9f564a8a11aaccd1249048f17e58f7d40f09567fe7da28fd6c3f731028d3b/9.2.8/lib/x86_64-osx-ghc-9.2.8"
 datadir    = "/Users/zachtoolson/workspace/rideshare-hs/.stack-work/install/x86_64-osx/56d9f564a8a11aaccd1249048f17e58f7d40f09567fe7da28fd6c3f731028d3b/9.2.8/share/x86_64-osx-ghc-9.2.8/rideshare-hs-0.0.0"
 libexecdir = "/Users/zachtoolson/workspace/rideshare-hs/.stack-work/install/x86_64-osx/56d9f564a8a11aaccd1249048f17e58f7d40f09567fe7da28fd6c3f731028d3b/9.2.8/libexec/x86_64-osx-ghc-9.2.8/rideshare-hs-0.0.0"

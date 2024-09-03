@@ -503,10 +503,10 @@
 #endif /* MIN_TOOL_VERSION_runghc */
 
 #ifndef CURRENT_PACKAGE_KEY
-#define CURRENT_PACKAGE_KEY "rideshare-hs-0.0.0-8mdrVUiPRtQLSvUkR1TU9N"
+#define CURRENT_PACKAGE_KEY "rideshare-hs-0.0.0-Fq5opIjRQGRBeu5nTR3Irw"
 #endif /* CURRENT_packageKey */
 #ifndef CURRENT_COMPONENT_ID
-#define CURRENT_COMPONENT_ID "rideshare-hs-0.0.0-8mdrVUiPRtQLSvUkR1TU9N"
+#define CURRENT_COMPONENT_ID "rideshare-hs-0.0.0-Fq5opIjRQGRBeu5nTR3Irw"
 #endif /* CURRENT_COMPONENT_ID */
 #ifndef CURRENT_PACKAGE_VERSION
 #define CURRENT_PACKAGE_VERSION "0.0.0"

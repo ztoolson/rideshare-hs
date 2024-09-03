@@ -116,11 +116,6 @@ instance Yesod App where
                     , menuItemRoute = HomeR
                     , menuItemAccessCallback = True
                     }
-                , NavbarLeft $ MenuItem
-                    { menuItemLabel = "Profile"
-                    , menuItemRoute = ProfileR
-                    , menuItemAccessCallback = isJust muser
-                    }
                 , NavbarRight $ MenuItem
                     { menuItemLabel = "Login"
                     , menuItemRoute = AuthR LoginR
@@ -169,10 +164,6 @@ instance Yesod App where
     isAuthorized RobotsR _ = return Authorized
     isAuthorized (StaticR _) _ = return Authorized
 
-    -- the profile route requires that the user is authenticated, so we
-    -- delegate to that function
-    isAuthorized ProfileR _ = isAuthenticated
-
     -- This function creates static content files in the static folder
     -- and names them based on a hash of their content. This allows
     -- expiration dates to be set far in the future without worry of
@@ -219,7 +210,6 @@ instance YesodBreadcrumbs App where
         -> Handler (Text, Maybe (Route App))
     breadcrumb HomeR = return ("Home", Nothing)
     breadcrumb (AuthR _) = return ("Login", Just HomeR)
-    breadcrumb ProfileR = return ("Profile", Just HomeR)
     breadcrumb  _ = return ("home", Nothing)
 
 -- How to run database actions.
