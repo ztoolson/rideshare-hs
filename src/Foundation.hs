@@ -36,9 +36,6 @@ instance Yesod App where
             Nothing -> getApprootText guessApproot app req
             Just root -> root
 
-    makeSessionBackend :: App -> IO (Maybe SessionBackend)
-    makeSessionBackend _ = return Nothing
-
     yesodMiddleware :: ToTypedContent res => Handler res -> Handler res
     yesodMiddleware = defaultYesodMiddleware
 

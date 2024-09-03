@@ -3,7 +3,6 @@
 module Handler.HomeSpec (spec) where
 
 import TestImport
-import Data.Aeson (Value(..), object, (.=))
 
 spec :: Spec
 spec = withApp $ do

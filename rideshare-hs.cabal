@@ -46,7 +46,6 @@ library
     , fast-logger >=2.2 && <3.2
     , file-embed
     , foreign-store
-    , hjsmin >=0.1 && <0.3
     , http-client-tls ==0.3.*
     , http-conduit ==2.3.*
     , monad-control >=0.3 && <1.1
@@ -55,7 +54,6 @@ library
     , persistent-postgresql ==2.13.*
     , persistent-template >=2.5 && <2.14
     , safe
-    , shakespeare ==2.0.*
     , template-haskell
     , text >=0.11 && <2.0
     , time
@@ -69,8 +67,6 @@ library
     , yesod ==1.6.*
     , yesod-auth ==1.6.*
     , yesod-core ==1.6.*
-    , yesod-form >=1.6 && <1.8
-    , yesod-static ==1.6.*
   default-language: Haskell2010
   if (flag(dev)) || (flag(library-only))
     ghc-options: -Wall -fwarn-tabs -O0
@@ -101,7 +97,6 @@ executable rideshare-hs
     , fast-logger >=2.2 && <3.2
     , file-embed
     , foreign-store
-    , hjsmin >=0.1 && <0.3
     , http-client-tls ==0.3.*
     , http-conduit ==2.3.*
     , monad-control >=0.3 && <1.1
@@ -111,7 +106,6 @@ executable rideshare-hs
     , persistent-template >=2.5 && <2.14
     , rideshare-hs
     , safe
-    , shakespeare ==2.0.*
     , template-haskell
     , text >=0.11 && <2.0
     , time
@@ -125,8 +119,6 @@ executable rideshare-hs
     , yesod ==1.6.*
     , yesod-auth ==1.6.*
     , yesod-core ==1.6.*
-    , yesod-form >=1.6 && <1.8
-    , yesod-static ==1.6.*
   default-language: Haskell2010
   if flag(library-only)
     buildable: False
@@ -156,7 +148,6 @@ test-suite rideshare-hs-test
     , fast-logger >=2.2 && <3.2
     , file-embed
     , foreign-store
-    , hjsmin >=0.1 && <0.3
     , hspec >=2.0.0
     , http-client-tls ==0.3.*
     , http-conduit ==2.3.*
@@ -167,7 +158,6 @@ test-suite rideshare-hs-test
     , persistent-template >=2.5 && <2.14
     , rideshare-hs
     , safe
-    , shakespeare ==2.0.*
     , template-haskell
     , text >=0.11 && <2.0
     , time
@@ -181,7 +171,5 @@ test-suite rideshare-hs-test
     , yesod ==1.6.*
     , yesod-auth ==1.6.*
     , yesod-core ==1.6.*
-    , yesod-form >=1.6 && <1.8
-    , yesod-static ==1.6.*
     , yesod-test
   default-language: Haskell2010
