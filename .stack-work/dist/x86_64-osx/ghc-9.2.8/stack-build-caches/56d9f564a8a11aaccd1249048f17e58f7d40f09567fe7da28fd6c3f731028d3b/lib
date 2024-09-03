@@ -4,28 +4,22 @@
   hash: c0af176ebcd0f4838b5227f08662deab18103941aa9f32a5beb233d1c64e082c
 /Users/zachtoolson/workspace/rideshare-hs/.stack-work/dist/x86_64-osx/ghc-9.2.8/build/autogen/cabal_macros.h:
   hash: 33608cfdb10b14d37c00e1f1ac9a5a61f71f6d800bf6b98aef9aad0906625f80
-/Users/zachtoolson/workspace/rideshare-hs/config/favicon.ico:
-  hash: 26f64af57709ca371fe68e50a5d915661e4aa017748983906d57d00f7fc3f748
 /Users/zachtoolson/workspace/rideshare-hs/config/models.persistentmodels:
   hash: b6c8d6b8b49cba0ece29a169c8b68a31d75a75c49d72baf6f9cc4c229dc7eb9d
-/Users/zachtoolson/workspace/rideshare-hs/config/robots.txt:
-  hash: fd89345af6aca5dab85f2aa6a830e270a362b1fa6b5f19607ddd773a081ed651
 /Users/zachtoolson/workspace/rideshare-hs/config/routes.yesodroutes:
-  hash: 555c50f7295a8bdc460cf1d30868c6a8e1a567988131482fbf81235434017ae0
+  hash: 74b68e7393d3c8258d8510de9a1aabe1f229c8187d59d315993b577a4532eccd
 /Users/zachtoolson/workspace/rideshare-hs/config/settings.yml:
   hash: 0da05663c47e248c741076f2876816da16076fa730a74c8ff34dc9bc6321ed16
 /Users/zachtoolson/workspace/rideshare-hs/package.yaml:
   hash: 08383d0a99f37a10647eb0fa82e0250503db11aeae31c3c33713d9c8a9882307
 /Users/zachtoolson/workspace/rideshare-hs/rideshare-hs.cabal:
-  hash: e68089a661bb742e53e400270e55f229f2c39de54363e4de1af480b49563f9b4
+  hash: dcd694083c6a53eaf94f1af116e19ad42e770b36440822f8a9fe96d7ea319406
 /Users/zachtoolson/workspace/rideshare-hs/src/Application.hs:
-  hash: 6239d35ebb4bdf8e4f0044baba2b05c53a402dd6009924b45b6833bbe1c6c9f9
+  hash: 1899114b2f1e87ad0951f02a0b054ef4a238a710c90a09fbcfd619818bf9305e
 /Users/zachtoolson/workspace/rideshare-hs/src/Foundation.hs:
-  hash: 4ec46ea390a42135857d0b31ac46fcdbd1bd69d432e299e9ffb9a4bd7af89b92
+  hash: 63d4624ad74337a2182c767f05b8875b68fcac84329d45c7c7572b8c8ffec0c5
 /Users/zachtoolson/workspace/rideshare-hs/src/Handler/Comment.hs:
   hash: 9e1ddf82aa3955ff89bab341e3db4f311379d560fe342110e2b33e45c15555cb
-/Users/zachtoolson/workspace/rideshare-hs/src/Handler/Common.hs:
-  hash: e71035acb286cb06fee6a8629b078cae31385b98251f88e871d27d196a5fdb02
 /Users/zachtoolson/workspace/rideshare-hs/src/Handler/Home.hs:
   hash: 759541c02f6c16a65a16b64fb5a5fdc367d9f5694d037190a8702274f016e845
 /Users/zachtoolson/workspace/rideshare-hs/src/Import.hs:
@@ -42,11 +36,5 @@
   hash: 3eb1339646bbebe23b958b9b8ddbf68c7979576fc13008f023b23e32ebfef8be
 /Users/zachtoolson/workspace/rideshare-hs/templates/default-layout.hamlet:
   hash: 129d6288bff05836cfbce2b318196aaefe0dc844435a4e772f0ab0c64aa7df10
-/Users/zachtoolson/workspace/rideshare-hs/templates/default-layout.lucius:
-  hash: 0c987f1e79611e59787e0c99c35810d674ee4c9fb2f8499167ed920209aa2d91
 /Users/zachtoolson/workspace/rideshare-hs/templates/homepage.hamlet:
   hash: 53d585c58c9fe7474c52f5e907f70acf7a3242f374bd54699b3e307dd51ba3d4
-/Users/zachtoolson/workspace/rideshare-hs/templates/homepage.julius:
-  hash: b30d190f470d6a7ab022cc4248391cfb3633619abf6e2ddcfdf7e50497fb4e71
-/Users/zachtoolson/workspace/rideshare-hs/templates/homepage.lucius:
-  hash: de522d3ac9f32c9efdfdafc983190368b5737d6093e96cc6213c943cca01f361
