@@ -22,6 +22,7 @@ library
   exposed-modules:
       Application
       Foundation
+      Handler.Api.Auth
       Handler.Home
       Import
       Import.NoFoundation
@@ -34,6 +35,7 @@ library
   build-depends:
       aeson >=1.4 && <2.1
     , base >=4.9.1.0 && <5
+    , bcrypt
     , bytestring >=0.10 && <0.12
     , case-insensitive
     , classy-prelude ==1.5.*
@@ -48,6 +50,7 @@ library
     , foreign-store
     , http-client-tls ==0.3.*
     , http-conduit ==2.3.*
+    , jwt
     , monad-control >=0.3 && <1.1
     , monad-logger ==0.3.*
     , persistent >=2.9 && <2.14
@@ -85,6 +88,7 @@ executable rideshare-hs
   build-depends:
       aeson >=1.4 && <2.1
     , base >=4.9.1.0 && <5
+    , bcrypt
     , bytestring >=0.10 && <0.12
     , case-insensitive
     , classy-prelude ==1.5.*
@@ -99,6 +103,7 @@ executable rideshare-hs
     , foreign-store
     , http-client-tls ==0.3.*
     , http-conduit ==2.3.*
+    , jwt
     , monad-control >=0.3 && <1.1
     , monad-logger ==0.3.*
     , persistent >=2.9 && <2.14
@@ -127,6 +132,7 @@ test-suite rideshare-hs-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      Handler.Api.AuthSpec
       Handler.HomeSpec
       TestImport
       Paths_rideshare_hs
@@ -136,6 +142,7 @@ test-suite rideshare-hs-test
   build-depends:
       aeson >=1.4 && <2.1
     , base >=4.9.1.0 && <5
+    , bcrypt
     , bytestring >=0.10 && <0.12
     , case-insensitive
     , classy-prelude ==1.5.*
@@ -151,6 +158,7 @@ test-suite rideshare-hs-test
     , hspec >=2.0.0
     , http-client-tls ==0.3.*
     , http-conduit ==2.3.*
+    , jwt
     , monad-control >=0.3 && <1.1
     , monad-logger ==0.3.*
     , persistent >=2.9 && <2.14

@@ -2,3 +2,6 @@
 -- Syntax for this file here: https://www.yesodweb.com/book/routing-and-handlers
 
 / HomeR GET
+
+/api/auth/login AuthLoginR POST
+/api/auth/signup AuthSignupR POST
