@@ -57,9 +57,12 @@ wipeDB app = runDBWithApp app $ do
     -- Should your application grow to hundreds of tables and tests,
     -- switching to DELETE could be a substantial speedup.
     -- See: https://github.com/yesodweb/yesod-scaffold/issues/201
-    let escapedTables = map (\t -> getEscapedRawName t sqlBackend) tables
-        query = "TRUNCATE TABLE " ++ intercalate ", " escapedTables
-    rawExecute query []
+
+    -- If there are no tables, return immediately
+    unless (null tables) $ do
+        let escapedTables = map (\t -> getEscapedRawName t sqlBackend) tables
+            query = "TRUNCATE TABLE " ++ intercalate ", " escapedTables
+        rawExecute query []
 
 getTables :: DB [Text]
 getTables = do

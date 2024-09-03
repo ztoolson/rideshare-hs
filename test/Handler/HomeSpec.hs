@@ -11,4 +11,4 @@ spec = withApp $ do
         it "returns a JSON message" $ do
           get HomeR
           statusIs 200
-          bodyContains "Hello to Yesod"
+          bodyContains "Welcome to Yesod"
