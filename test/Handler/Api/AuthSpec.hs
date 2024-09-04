@@ -16,6 +16,10 @@ spec = withApp $ do
             let signupRequest = object
                     [ "email" .= ("test@example.com" :: Text)
                     , "password" .= ("password123" :: Text)
+                    , "firstName" .= ("John" :: Text)
+                    , "lastName" .= ("Doe" :: Text)
+                    , "type" .= ("Driver" :: Text)
+                    , "driversLicenseNumber" .= ("DL123456" :: Text)
                     ]
 
             request $ do
@@ -29,11 +33,26 @@ spec = withApp $ do
             bodyContains "userId"
 
         it "returns an error for duplicate email" $ do
-            _ <- runDB $ insert $ User "existing@example.com" "hashedpassword"
+            currentTime <- liftIO getCurrentTime
+            _ <- runDB $ insert $ User
+                                    { userEmail = "existing@example.com"
+                                    , userPasswordHash = "hashedpassword"
+                                    , userFirstName = "John"
+                                    , userLastName = "Doe"
+                                    , userType = "Driver"
+                                    , userCreatedAt = currentTime
+                                    , userUpdatedAt = currentTime
+                                    , userTripsCount = Nothing
+                                    , userDriversLicenseNumber = Nothing
+                                    }
 
             let duplicateRequest = object
                     [ "email" .= ("existing@example.com" :: Text)
                     , "password" .= ("password123" :: Text)
+                    , "firstName" .= ("John" :: Text)
+                    , "lastName" .= ("Doe" :: Text)
+                    , "type" .= ("Driver" :: Text)
+                    , "driversLicenseNumber" .= ("DL123456" :: Text)
                     ]
 
             request $ do
@@ -52,7 +71,18 @@ spec = withApp $ do
             mHashedPass <- liftIO $ hashPassword $ PlainTextPassword password
             case mHashedPass of
                 Just (HashedPassword hashedPass) -> do
-                    _ <- runDB $ insert $ User email hashedPass
+                    currentTime <- liftIO getCurrentTime
+                    _ <- runDB $ insert $ User
+                                            { userEmail = email
+                                            , userPasswordHash = hashedPass
+                                            , userFirstName = "John"
+                                            , userLastName = "Doe"
+                                            , userType = "Driver"
+                                            , userCreatedAt = currentTime
+                                            , userUpdatedAt = currentTime
+                                            , userTripsCount = Nothing
+                                            , userDriversLicenseNumber = Nothing
+                                            }
                     let loginRequest = object
                             ["email" .= email
                             , "password" .= password

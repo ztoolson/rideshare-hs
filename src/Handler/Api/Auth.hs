@@ -6,7 +6,7 @@
 module Handler.Api.Auth where
 
 import Import
-import Data.Aeson (withObject)
+import Data.Aeson (withObject, (.:?))
 import Database.Persist.Sql(fromSqlKey)
 import Crypto.BCrypt (hashPasswordUsingPolicy, slowerBcryptHashingPolicy, validatePassword)
 import Data.Time (addUTCTime)
@@ -54,29 +54,48 @@ postAuthLoginR = do
 
 
 data SignupRequest = SignupRequest
-    { email :: Text
-    , password :: PlainTextPassword
+    { signupEmail :: Text
+    , signupPassword :: PlainTextPassword
+    , signupFirstName :: Text
+    , signupLastName :: Text
+    , signupType :: Text
+    , signupDriversLicenseNumber :: Maybe Text
     } deriving Show
 
 instance FromJSON SignupRequest where
     parseJSON = withObject "SignupRequest" $ \v -> SignupRequest
         <$> v .: "email"
         <*> (PlainTextPassword <$> v .: "password")
+        <*>  v .: "firstName"
+        <*>  v .: "lastName"
+        <*>  v .: "type"
+        <*>  v .:? "driversLicenseNumber"
 
 postAuthSignupR :: Handler Value
 postAuthSignupR = do
     signupReq <- requireCheckJsonBody :: Handler SignupRequest
 
     -- check if user already exists
-    mExistingUser <- runDB $ getBy $ UniqueUserEmail (email signupReq)
+    mExistingUser <- runDB $ getBy $ UniqueUserEmail (signupEmail signupReq)
     case mExistingUser of
         Just _ -> sendStatusJSON status400 $ object ["error" .= ("Email already in use" :: Text)]
         Nothing -> do
-            mHashedPass <- liftIO $ hashPassword (password signupReq)
+            mHashedPass <- liftIO $ hashPassword (signupPassword signupReq)
             case mHashedPass of 
                 Nothing -> sendStatusJSON status500 $ object ["error" .= ("Failed to hash password" :: Text)]
                 Just (HashedPassword hashedPass) -> do
-                    userId <- runDB $ insert $ User (email signupReq) hashedPass
+                    currentTime <- liftIO getCurrentTime
+                    userId <- runDB $ insert $ User
+                        { userEmail = signupEmail signupReq
+                        , userPasswordHash = hashedPass
+                        , userFirstName = signupFirstName signupReq
+                        , userLastName = signupLastName signupReq
+                        , userType = signupType signupReq
+                        , userCreatedAt = currentTime
+                        , userUpdatedAt = currentTime
+                        , userTripsCount = Nothing
+                        , userDriversLicenseNumber = signupDriversLicenseNumber signupReq
+                        }
 
                     -- generate JWT token
                     time <- liftIO getCurrentTime

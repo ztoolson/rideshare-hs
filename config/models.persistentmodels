@@ -5,5 +5,12 @@
 User
     email Text
     passwordHash ByteString
+    firstName Text
+    lastName Text
+    type Text
+    createdAt UTCTime default=CURRENT_TIMESTAMP
+    updatedAt UTCTime default=CURRENT_TIMESTAMP
+    tripsCount Int Maybe
+    driversLicenseNumber Text Maybe max
     UniqueUserEmail email
     deriving Show
