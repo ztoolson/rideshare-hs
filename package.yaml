@@ -32,6 +32,7 @@ dependencies:
 - file-embed
 - safe
 - bcrypt
+- shakespeare
 - jwt
 - unordered-containers
 - containers

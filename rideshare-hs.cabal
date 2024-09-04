@@ -57,6 +57,7 @@ library
     , persistent-postgresql ==2.13.*
     , persistent-template >=2.5 && <2.14
     , safe
+    , shakespeare
     , template-haskell
     , text >=0.11 && <2.0
     , time
@@ -111,6 +112,7 @@ executable rideshare-hs
     , persistent-template >=2.5 && <2.14
     , rideshare-hs
     , safe
+    , shakespeare
     , template-haskell
     , text >=0.11 && <2.0
     , time
@@ -166,6 +168,7 @@ test-suite rideshare-hs-test
     , persistent-template >=2.5 && <2.14
     , rideshare-hs
     , safe
+    , shakespeare
     , template-haskell
     , text >=0.11 && <2.0
     , time
