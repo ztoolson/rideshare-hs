@@ -45,6 +45,7 @@ library
     , containers
     , data-default
     , directory >=1.1 && <1.4
+    , email-validate
     , fast-logger >=2.2 && <3.2
     , file-embed
     , foreign-store
@@ -99,6 +100,7 @@ executable rideshare-hs
     , containers
     , data-default
     , directory >=1.1 && <1.4
+    , email-validate
     , fast-logger >=2.2 && <3.2
     , file-embed
     , foreign-store
@@ -154,6 +156,7 @@ test-suite rideshare-hs-test
     , containers
     , data-default
     , directory >=1.1 && <1.4
+    , email-validate
     , fast-logger >=2.2 && <3.2
     , file-embed
     , foreign-store

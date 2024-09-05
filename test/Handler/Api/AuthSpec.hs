@@ -8,6 +8,7 @@ import TestImport
 import Handler.Api.Auth
 import Data.Aeson (object, (.=), encode)
 import Database.Persist.Sql (toSqlKey)
+import qualified Data.Text as T
 
 spec :: Spec
 spec = withApp $ do
@@ -64,6 +65,50 @@ spec = withApp $ do
             statusIs 400
             bodyContains "Email already in use"
 
+        it "returns errors for empty email and password" $ do
+            let allInvalidRequest = object
+                    [ "email" .= ("" :: Text)
+                    , "password" .= ("" :: Text)
+                    , "firstName" .= ("John" :: Text)
+                    , "lastName" .= ("Doe" :: Text)
+                    , "type" .= ("Driver" :: Text)
+                    , "driversLicenseNumber" .= ("DL123456" :: Text)
+                    ]
+
+            request $ do
+                setMethod "POST"
+                setUrl AuthSignupR
+                setRequestBody $ encode allInvalidRequest
+                addRequestHeader ("Content-Type", "application/json")
+
+            statusIs 400
+            bodyContains "Email is required"
+            bodyContains "Password is required"
+
+        it "returns errors for all invalid fields" $ do
+            let allInvalidRequest = object
+                    [ "email" .= ("invalid-email" :: Text)
+                    , "password" .= ("short" :: Text)
+                    , "firstName" .= ("" :: Text)
+                    , "lastName" .= ("" :: Text)
+                    , "type" .= ("" :: Text)
+                    , "driversLicenseNumber" .= (T.replicate 101 "a" :: Text)  -- 101 characters long
+                    ]
+
+            request $ do
+                setMethod "POST"
+                setUrl AuthSignupR
+                setRequestBody $ encode allInvalidRequest
+                addRequestHeader ("Content-Type", "application/json")
+
+            statusIs 400
+            bodyContains "Invalid email format"
+            bodyContains "Password must be at least 8 characters long"
+            bodyContains "First name is required"
+            bodyContains "Last name is required"
+            bodyContains "Type is required"
+            bodyContains "Driver's license number must be at most 100 characters"
+
     describe "postAuthLoginR" $ do
         it "successfully logs in an existing user" $ do
             let email = "login@example.com"
@@ -111,3 +156,4 @@ spec = withApp $ do
 
             statusIs 401
             bodyContains "Invalid email or password"
+

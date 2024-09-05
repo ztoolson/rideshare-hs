@@ -33,6 +33,7 @@ dependencies:
 - safe
 - bcrypt
 - shakespeare
+- email-validate
 - jwt
 - unordered-containers
 - containers
