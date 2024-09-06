@@ -85,6 +85,20 @@ spec = withApp $ do
             bodyContains "Email is required"
             bodyContains "Password is required"
 
+        it "handles if not all fields are sent" $ do
+            let allInvalidRequest = object
+                    [ "email" .= ("" :: Text)
+                    , "password" .= ("" :: Text)
+                    ]
+
+            request $ do
+                setMethod "POST"
+                setUrl AuthSignupR
+                setRequestBody $ encode allInvalidRequest
+                addRequestHeader ("Content-Type", "application/json")
+
+            statusIs 400
+
         it "returns errors for all invalid fields" $ do
             let allInvalidRequest = object
                     [ "email" .= ("invalid-email" :: Text)
@@ -141,6 +155,19 @@ spec = withApp $ do
                     statusIs 200
                     bodyContains "token"
                     bodyContains "userId"
+
+        it "handles if not all fields are sent" $ do
+            let allInvalidRequest = object
+                    [ "email" .= ("" :: Text)
+                    ]
+
+            request $ do
+                setMethod "POST"
+                setUrl AuthSignupR
+                setRequestBody $ encode allInvalidRequest
+                addRequestHeader ("Content-Type", "application/json")
+
+            statusIs 400
 
         it "returns an error for invalid credentials" $ do
             let loginRequest = object
