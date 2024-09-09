@@ -23,6 +23,7 @@ library
       Application
       Foundation
       Handler.Api.Auth
+      Handler.Api.HelloWorld
       Handler.Home
       Import
       Import.NoFoundation
@@ -137,6 +138,7 @@ test-suite rideshare-hs-test
   main-is: Spec.hs
   other-modules:
       Handler.Api.AuthSpec
+      Handler.Api.HelloWorldSpec
       Handler.HomeSpec
       TestImport
       Paths_rideshare_hs
