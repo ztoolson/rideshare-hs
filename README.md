@@ -1,3 +1,8 @@
+# rideshare-hs
+
+This is me learning Haskell while reading the book [High Performance PostgreSQL for Rails](https://pragprog.com/titles/aapsql/high-performance-postgresql-for-rails/). I'm rebuilding the [rideshare app](https://github.com/andyatkinson/rideshare) just for fun.
+
+
 ## Database Setup
 
 After installing Postgres, run:
