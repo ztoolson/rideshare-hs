@@ -146,7 +146,8 @@ test-suite rideshare-hs-test
       test
   ghc-options: -Wall
   build-depends:
-      aeson >=1.4 && <2.1
+      HUnit
+    , aeson >=1.4 && <2.1
     , base >=4.9.1.0 && <5
     , bcrypt
     , bytestring >=0.10 && <0.12

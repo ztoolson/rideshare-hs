@@ -86,6 +86,7 @@ tests:
     - rideshare-hs
     - hspec >=2.0.0
     - yesod-test
+    - HUnit
 
 # Define flags used by "yesod devel" to make compilation faster
 flags:

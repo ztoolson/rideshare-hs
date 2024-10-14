@@ -11,6 +11,6 @@ User
     createdAt UTCTime default=CURRENT_TIMESTAMP
     updatedAt UTCTime default=CURRENT_TIMESTAMP
     tripsCount Int Maybe
-    driversLicenseNumber Text Maybe max
+    driversLicenseNumber Text Maybe maxlen=100
     UniqueUserEmail email
     deriving Show

@@ -7,8 +7,8 @@ module Handler.Api.AuthSpec (spec) where
 import TestImport
 import Handler.Api.Auth
 import Data.Aeson (object, (.=), encode)
-import Database.Persist.Sql (toSqlKey)
 import qualified Data.Text as T
+import Test.HUnit (assertFailure)
 
 spec :: Spec
 spec = withApp $ do
@@ -155,6 +155,8 @@ spec = withApp $ do
                     statusIs 200
                     bodyContains "token"
                     bodyContains "userId"
+                Nothing -> do
+                    liftIO $ assertFailure "Failed to hash password"
 
         it "handles if not all fields are sent" $ do
             let allInvalidRequest = object
