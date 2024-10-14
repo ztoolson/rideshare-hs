@@ -14,3 +14,49 @@ User
     driversLicenseNumber Text Maybe maxlen=100
     UniqueUserEmail email
     deriving Show
+
+Location
+    address Text
+    city Text
+    state Text
+    position Point
+    createdAt UTCTime default=CURRENT_TIMESTAMP
+    updatedAt UTCTime default=CURRENT_TIMESTAMP
+    UniqueAddress address
+    deriving Show
+
+Trip
+    tripRequest TripRequestId
+    driver UserId
+    completedAt UTCTime Maybe
+    rating Int Maybe
+    createdAt UTCTime default=CURRENT_TIMESTAMP
+    updatedAt UTCTime default=CURRENT_TIMESTAMP
+    deriving Show
+
+TripRequest
+    rider UserId
+    startLocation LocationId
+    endLocation LocationId
+    createdAt UTCTime default=CURRENT_TIMESTAMP
+    updatedAt UTCTime default=CURRENT_TIMESTAMP
+    UniqueRiderLocations rider startLocation endLocation
+    deriving Show
+
+Vehicle
+    name Text
+    status VehicleStatus default='Draft'
+    createdAt UTCTime default=CURRENT_TIMESTAMP
+    updatedAt UTCTime default=CURRENT_TIMESTAMP
+    UniqueName name
+    deriving Show
+
+VehicleReservation
+    vehicle VehicleId
+    tripRequest TripRequestId
+    canceled Bool default=false
+    startsAt UTCTime
+    endsAt UTCTime
+    createdAt UTCTime default=CURRENT_TIMESTAMP
+    updatedAt UTCTime default=CURRENT_TIMESTAMP
+    deriving Show

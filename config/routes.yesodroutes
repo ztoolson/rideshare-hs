@@ -8,3 +8,5 @@
 
 -- test endpoint for auth
 /api/hello HelloWorldR GET
+
+/api/trip_requests TripRequestsR POST

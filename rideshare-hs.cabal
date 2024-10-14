@@ -24,6 +24,7 @@ library
       Foundation
       Handler.Api.Auth
       Handler.Api.HelloWorld
+      Handler.Api.TripRequests
       Handler.Home
       Import
       Import.NoFoundation
@@ -140,6 +141,7 @@ test-suite rideshare-hs-test
       Handler.Api.AuthSpec
       Handler.Api.HelloWorldSpec
       Handler.HomeSpec
+      ModelSpec
       TestImport
       Paths_rideshare_hs
   hs-source-dirs:
