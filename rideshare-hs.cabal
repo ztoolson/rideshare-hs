@@ -1,6 +1,6 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.36.0.
+-- This file has been generated from package.yaml by hpack version 0.37.0.
 --
 -- see: https://github.com/sol/hpack
 
@@ -48,11 +48,13 @@ library
     , data-default
     , directory >=1.1 && <1.4
     , email-validate
+    , esqueleto
     , fast-logger >=2.2 && <3.2
     , file-embed
     , foreign-store
     , http-client-tls ==0.3.*
     , http-conduit ==2.3.*
+    , http-types
     , jwt
     , monad-control >=0.3 && <1.1
     , monad-logger ==0.3.*
@@ -64,6 +66,7 @@ library
     , template-haskell
     , text >=0.11 && <2.0
     , time
+    , transformers
     , unordered-containers
     , vector
     , wai
@@ -103,11 +106,13 @@ executable rideshare-hs
     , data-default
     , directory >=1.1 && <1.4
     , email-validate
+    , esqueleto
     , fast-logger >=2.2 && <3.2
     , file-embed
     , foreign-store
     , http-client-tls ==0.3.*
     , http-conduit ==2.3.*
+    , http-types
     , jwt
     , monad-control >=0.3 && <1.1
     , monad-logger ==0.3.*
@@ -120,6 +125,7 @@ executable rideshare-hs
     , template-haskell
     , text >=0.11 && <2.0
     , time
+    , transformers
     , unordered-containers
     , vector
     , wai
@@ -162,12 +168,14 @@ test-suite rideshare-hs-test
     , data-default
     , directory >=1.1 && <1.4
     , email-validate
+    , esqueleto
     , fast-logger >=2.2 && <3.2
     , file-embed
     , foreign-store
     , hspec >=2.0.0
     , http-client-tls ==0.3.*
     , http-conduit ==2.3.*
+    , http-types
     , jwt
     , monad-control >=0.3 && <1.1
     , monad-logger ==0.3.*
@@ -180,6 +188,7 @@ test-suite rideshare-hs-test
     , template-haskell
     , text >=0.11 && <2.0
     , time
+    , transformers
     , unordered-containers
     , vector
     , wai

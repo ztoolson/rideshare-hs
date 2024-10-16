@@ -20,7 +20,7 @@ module Application
     , db
     ) where
 
-import Control.Monad.Logger                 (liftLoc, runLoggingT)
+import Control.Monad.Logger                 (liftLoc, runLoggingT, LoggingT)
 import Database.Persist.Postgresql          (createPostgresqlPool, pgConnStr,
                                              pgPoolSize, runSqlPool)
 import Import
@@ -79,10 +79,15 @@ makeFoundation appSettings = do
         (pgPoolSize $ appDatabaseConf appSettings)
 
     -- Perform database migration using our application's logging settings.
-    runLoggingT (runSqlPool (runMigration migrateAll) pool) logFunc
+    runLoggingT (runSqlPool doMigrations pool) logFunc
 
     -- Return the foundation
     return $ mkFoundation pool
+
+doMigrations :: ReaderT SqlBackend (LoggingT IO) ()
+doMigrations = do
+    runMigration migrateAll
+    -- TODO: update to read from a migration file or something for custom SQL
 
 -- | Convert our foundation to a WAI Application by calling @toWaiAppPlain@ and
 -- applying some additional middlewares.
