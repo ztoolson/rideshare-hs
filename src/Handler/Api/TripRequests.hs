@@ -30,7 +30,7 @@ newtype TripResponse = TripResponse
 
 instance ToJSON TripResponse where
     toJSON TripResponse{..} = object
-        [ "trip_request_id" .= fromSqlKey tripRequestId
+        [ "tripRequestId" .= fromSqlKey tripRequestId
         ]
 
 -- | Create a new trip request
@@ -85,7 +85,11 @@ findOrCreateLocation addr = do
 createTrip :: TripRequestId -> ReaderT SqlBackend Handler (Entity Trip)
 createTrip reqId = do
     now <- liftIO getCurrentTime
-    driver <- findBestAvailableDriver >>= maybe notFound pure
+    mDriver <- findBestAvailableDriver
+    driver <- case mDriver of
+        Nothing -> lift $ sendStatusJSON status404 $
+            object ["error" .= ("No available drivers found" :: Text)]
+        Just d -> return d
     insertEntity Trip
         { tripTripRequest = reqId
         , tripDriver = entityKey driver
@@ -101,9 +105,11 @@ defaultPoint :: Point
 defaultPoint = Point 0 0
 
 findBestAvailableDriver :: ReaderT SqlBackend Handler (Maybe (Entity User))
-findBestAvailableDriver = fmap listToMaybe $ E.select $ do
-    u <- E.from $ E.table @User
-    E.where_ (u ^. UserType E.==. E.val "driver")
-    E.orderBy [E.rand]
-    E.limit 1
-    return u
+findBestAvailableDriver = do
+    driver <- E.select $ do
+        u <- E.from $ E.table @User
+        E.where_ (u ^. UserType E.==. E.val "driver")
+        E.orderBy [E.rand]
+        E.limit 1
+        return u
+    return $ listToMaybe driver
