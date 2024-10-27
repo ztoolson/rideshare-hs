@@ -8,14 +8,8 @@ module Handler.Api.TripRequests
     ) where
 
 import Import
-import qualified Data.Text as T
 import qualified Data.Aeson as A
-import Database.Persist.Sql (toSqlKey)
-import Yesod.Core.Handler (sendResponseStatus)
 import Database.Esqueleto.Experimental as E
-import Database.Esqueleto.Experimental ((^.))
-import Data.Maybe (listToMaybe)
-import Network.HTTP.Types.Status (created201)
 
 
 data TripRequestPayload = TripRequestPayload
@@ -26,9 +20,9 @@ data TripRequestPayload = TripRequestPayload
 
 instance FromJSON TripRequestPayload where
     parseJSON = A.withObject "TripRequestPayload" $ \v -> TripRequestPayload
-        <$> (toSqlKey <$> v .: "rider_id")
-        <*> v .: "start_address"
-        <*> v .: "end_address"
+        <$> (toSqlKey <$> v .: "riderId")
+        <*> v .: "startAddress"
+        <*> v .: "endAddress"
 
 newtype TripResponse = TripResponse
     { tripRequestId :: TripRequestId
@@ -43,7 +37,7 @@ instance ToJSON TripResponse where
 postTripRequestsR :: Handler A.Value
 postTripRequestsR = do
     payload <- requireCheckJsonBody :: Handler TripRequestPayload
-    runDB $ do
+    tripReqId <- runDB $ do
         -- Verify rider exists
         void $ get404 (tripRequestRiderId payload)
         
@@ -63,9 +57,11 @@ postTripRequestsR = do
             
         -- Create associated trip
         void $ createTrip tripReqId
+
+        pure tripReqId
         
-        -- Return response
-        sendResponseStatus created201 $ object ["trip_request_id" .= fromSqlKey tripReqId]
+    -- Return response
+    sendResponseStatus created201 $ toJSON $ TripResponse tripReqId
 
 -- | Helper to find or create a location
 findOrCreateLocation :: Text -> ReaderT SqlBackend Handler (Entity Location)

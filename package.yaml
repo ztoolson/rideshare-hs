@@ -90,6 +90,7 @@ tests:
     - hspec >=2.0.0
     - yesod-test
     - HUnit
+    - yesod-persistent
 
 # Define flags used by "yesod devel" to make compilation faster
 flags:

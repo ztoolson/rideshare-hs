@@ -146,6 +146,7 @@ test-suite rideshare-hs-test
   other-modules:
       Handler.Api.AuthSpec
       Handler.Api.HelloWorldSpec
+      Handler.Api.TripRequestsSpec
       Handler.HomeSpec
       ModelSpec
       TestImport
@@ -199,5 +200,6 @@ test-suite rideshare-hs-test
     , yesod ==1.6.*
     , yesod-auth ==1.6.*
     , yesod-core ==1.6.*
+    , yesod-persistent
     , yesod-test
   default-language: Haskell2010
