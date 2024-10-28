@@ -69,29 +69,20 @@ postCreateTripRequestsR = do
         
     sendResponseStatus created201 $ toJSON $ CreateTripResponse tripReqId
 
-
 -- getTripRequestR will check if the trip id exists, if it does it will return the trip request id and the associated trip id.
 getShowTripRequestR:: TripRequestId -> Handler A.Value
 getShowTripRequestR tripRequestId = do
-    result <- runDB $ do
-        -- Verify trip_request exist
-        mTripRequest <- get tripRequestId
-        case mTripRequest of
-            Nothing -> return Nothing
-            Just _tr -> do
-                mTrip <- selectFirst [TripTripRequest Import.==. tripRequestId] []
-                return $ Just $ object
-                    [ "tripRequestId" .= tripRequestId
-                    , "tripId" .= fmap entityKey mTrip
-                    ]
+    result <- runDB $ getTripWithRequest tripRequestId
 
     case result of
-        Nothing -> 
+        [] ->
             sendResponseStatus status422 $ 
                 object ["error" .= ("Trip request not found" :: Text)]
-        Just response -> 
-            sendResponseStatus status200 response
-
+        ((tripRequest, trip):_) -> 
+            sendResponseStatus status200 $ object
+                    [ "tripRequestId" .= tripRequestId
+                    , "tripId" .= fromSqlKey (entityKey trip)
+                    ]
 
 -- createTrip will find a driver and assign them to the trip request by creating a record in the trip table
 createTrip :: TripRequestId -> ReaderT SqlBackend Handler (Entity Trip)
@@ -146,3 +137,18 @@ findBestAvailableDriver = do
 -- TODO This should be replaced once geocoding is added in
 defaultPoint :: Point
 defaultPoint = Point 0 0
+
+-- getTripWithRequest does a db query to join trip_result and trip for the given trip request id.
+getTripWithRequest
+  :: MonadIO m
+  => TripRequestId
+  -> SqlPersistT m [(Entity TripRequest, Entity Trip)]
+getTripWithRequest tripRequestId = do
+  select $ do
+    (tripRequest :& trip) <-
+      from $ table @TripRequest
+        `innerJoin` table @Trip
+        `E.on` (\(tr :& t) ->
+          t ^. TripTripRequest E.==. tr ^. TripRequestId)
+    where_ (tripRequest ^. TripRequestId E.==. val tripRequestId)
+    pure (tripRequest, trip)
