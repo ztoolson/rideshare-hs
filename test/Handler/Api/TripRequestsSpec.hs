@@ -3,14 +3,15 @@
 
 module Handler.Api.TripRequestsSpec (spec) where
 
-import TestImport
+import TestImport hiding (toStrict, decodeUtf8, unpack, (.))
 import Test.HUnit (assertFailure)
 import Data.Aeson (object, (.=), encode)
-import Database.Persist.Sql (fromSqlKey)
+import Database.Persist.Sql (toSqlKey, fromSqlKey)
 import Data.Time.Clock (addUTCTime)
+import Data.Text.Encoding (decodeUtf8)
+import Data.Text (unpack)
+import Data.ByteString.Lazy (toStrict)
 import Handler.Api.Auth (generateJWT)
-import qualified Data.Text as T
-import qualified Data.Text.Encoding as TE
 
 createAuthToken :: Int64 -> Handler Text
 createAuthToken userId = do
@@ -20,11 +21,11 @@ createAuthToken userId = do
 
 spec :: Spec
 spec = withApp $ do
-    describe "POST /api/trip-requests" $ do
+    describe "POST /api/trip_requests" $ do
         it "successfully creates a trip request for authenticated rider" $ do
-                        -- Insert rider and driver directly into database
             time <- liftIO getCurrentTime
             
+            -- Insert rider and driver directly into database
             riderId <- runDB $ insert $ User
                 { userEmail = "rider@example.com"
                 , userPasswordHash = "hashedpass"
@@ -62,7 +63,7 @@ spec = withApp $ do
             -- Perform trip request
             request $ do
                 setMethod "POST"
-                setUrl TripRequestsR
+                setUrl CreateTripRequestsR
                 setRequestBody $ encode tripRequestPayload
                 addRequestHeader ("Content-Type", "application/json")
                 addRequestHeader ("Authorization", "Bearer " <> encodeUtf8 token)
@@ -101,3 +102,112 @@ spec = withApp $ do
                     tripDriver trip `shouldBe` driverId
                     isNothing (tripCompletedAt trip) `shouldBe` True
                     isNothing (tripRating trip) `shouldBe` True
+
+    describe "GET /api/trip-requests/:id" $ do
+        it "returns trip request and trip details when trip request exists" $ do
+            time <- liftIO getCurrentTime
+            
+            -- Create a rider
+            riderId <- runDB $ insert $ User
+                { userEmail = "rider@example.com"
+                , userPasswordHash = "hashedpass"
+                , userFirstName = "Test"
+                , userLastName = "Rider"
+                , userType = "rider"
+                , userCreatedAt = time
+                , userUpdatedAt = time
+                , userTripsCount = Nothing
+                , userDriversLicenseNumber = Nothing
+                }
+
+            -- Create start and end locations
+            startLocId <- runDB $ insert $ Location
+                { locationAddress = "123 Start St"
+                , locationCity = "Unknown"
+                , locationState = "Unknown"
+                , locationPosition = Point 0 0
+                , locationCreatedAt = time
+                , locationUpdatedAt = time
+                }
+
+            endLocId <- runDB $ insert $ Location
+                { locationAddress = "456 End Ave"
+                , locationCity = "Unknown"
+                , locationState = "Unknown"
+                , locationPosition = Point 0 0
+                , locationCreatedAt = time
+                , locationUpdatedAt = time
+                }
+
+            -- Create trip request
+            tripRequestId <- runDB $ insert $ TripRequest
+                { tripRequestRider = riderId
+                , tripRequestStartLocation = startLocId
+                , tripRequestEndLocation = endLocId
+                , tripRequestCreatedAt = time
+                , tripRequestUpdatedAt = time
+                }
+
+            -- Create associated trip
+            tripId <- runDB $ insert $ Trip
+                { tripTripRequest = tripRequestId
+                , tripDriver = riderId  -- Using rider as driver for simplicity
+                , tripCompletedAt = Nothing
+                , tripRating = Nothing
+                , tripCreatedAt = time
+                , tripUpdatedAt = time
+                }
+
+            -- Generate auth token for rider
+            token <- runHandler $ createAuthToken (fromSqlKey riderId)
+
+            -- Make request
+            request $ do
+                setMethod "GET"
+                setUrl $ ShowTripRequestR tripRequestId
+                addRequestHeader ("Authorization", "Bearer " <> encodeUtf8 token)
+
+            -- Verify response
+            statusIs 200
+            
+            let expectedResponse = object
+                    [ "tripRequestId" .= tripRequestId
+                    , "tripId" .= tripId
+                    ]
+            bodyEquals $ (unpack . decodeUtf8 . toStrict . encode) expectedResponse
+
+        it "returns 422 when trip request doesn't exist" $ do
+            time <- liftIO getCurrentTime
+
+            -- Create a rider
+            riderId <- runDB $ insert $ User
+                { userEmail = "rider@example.com"
+                , userPasswordHash = "hashedpass"
+                , userFirstName = "Test"
+                , userLastName = "Rider"
+                , userType = "rider"
+                , userCreatedAt = time
+                , userUpdatedAt = time
+                , userTripsCount = Nothing
+                , userDriversLicenseNumber = Nothing
+                }
+
+            -- Generate auth token for rider
+            token <- runHandler $ createAuthToken (fromSqlKey riderId)
+
+            -- Create a non-existent trip request ID
+            let nonExistentId = toSqlKey 999999
+
+            -- Make request
+            request $ do
+                setMethod "GET"
+                setUrl $ ShowTripRequestR nonExistentId
+                addRequestHeader ("Authorization", "Bearer " <> encodeUtf8 token)
+
+            -- Verify response
+            statusIs 422
+            
+            let expectedResponse = object
+                    [ "error" .= ("Trip request not found" :: Text)
+                    ]
+            bodyEquals $ (unpack . decodeUtf8 . toStrict . encode) expectedResponse

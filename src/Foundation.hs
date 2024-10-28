@@ -71,7 +71,8 @@ instance Yesod App where
     isAuthorized :: Route App -> Bool -> Handler AuthResult
     -- routes requiring authentication
     isAuthorized HelloWorldR _ = isAuthenticated
-    isAuthorized TripRequestsR _ = isAuthenticated
+    isAuthorized CreateTripRequestsR _ = isAuthenticated
+    isAuthorized (ShowTripRequestR tripId) _ = isAuthenticated
 
     -- routes not requiring authentication
     isAuthorized _ _ = return Authorized
