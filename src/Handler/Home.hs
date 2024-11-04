@@ -1,13 +1,14 @@
-{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+
 module Handler.Home where
 
 import Import
 
 getHomeR :: Handler Value
 getHomeR = do
-    -- Return a hard-coded JSON message
-    returnJson $ object ["message" .= ("Welcome to Yesod" :: Text)]
+  -- Return a hard-coded JSON message
+  returnJson $ object ["message" .= ("Welcome to Yesod" :: Text)]
