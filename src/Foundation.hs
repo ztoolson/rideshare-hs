@@ -9,17 +9,36 @@
 
 module Foundation where
 
+import Control.Monad ()
 import Control.Monad.Logger (LogSource)
+import Control.Monad.Trans.Maybe ()
+import qualified Data.Aeson as A
 import qualified Data.ByteString as BS
+import Data.HashMap.Strict ()
 import Data.Kind (Type)
+import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
 import Data.Time.Clock.POSIX (getPOSIXTime)
-import Database.Persist.Sql (ConnectionPool, runSqlPool)
+import Database.Persist.Sql (ConnectionPool, runSqlPool, toSqlKey)
 import Import.NoFoundation
 import qualified Web.JWT as JWT
 import Yesod.Core.Types (Logger)
 import qualified Yesod.Core.Unsafe as Unsafe
+
+-- define datatype for jwt token
+data JWTClaims = JWTClaims
+  { jwtUserId :: Key User, -- Using Key User instead of UserId
+    jwtExp :: Integer
+  }
+  deriving (Show)
+
+instance A.FromJSON JWTClaims where
+  parseJSON = A.withObject "JWTClaims" $ \v ->
+    JWTClaims
+      <$> (toSqlKey <$> v .: "user_id") -- Parse as Int64 and convert to Key User
+      <*> v
+      .: "exp"
 
 data App = App
   { appSettings :: AppSettings,
@@ -61,12 +80,12 @@ instance Yesod App where
 
   shouldLogIO :: App -> LogSource -> LogLevel -> IO Bool
   shouldLogIO app _source level =
-    return $
-      appShouldLogAll (appSettings app)
-        || level
-          == LevelWarn
-        || level
-          == LevelError
+    return
+      $ appShouldLogAll (appSettings app)
+      || level
+      == LevelWarn
+      || level
+      == LevelError
 
   makeLogger :: App -> IO Logger
   makeLogger = return . appLogger
@@ -76,6 +95,7 @@ instance Yesod App where
   isAuthorized HelloWorldR _ = isAuthenticated
   isAuthorized CreateTripRequestsR _ = isAuthenticated
   isAuthorized (ShowTripRequestR _) _ = isAuthenticated
+  isAuthorized MyTripsR _ = isAuthenticated
   -- routes not requiring authentication
   isAuthorized _ _ = return Authorized
 
@@ -103,10 +123,10 @@ isAuthenticated = do
   case mAuth of
     Nothing -> return (Unauthorized "Missing Authorization Header")
     Just token -> do
-      isValid <- liftIO $ validateJWT token
-      if isValid
-        then return Authorized
-        else return (Unauthorized "Invalid Token")
+      mClaims <- liftIO $ validateJWT token
+      case mClaims of
+        Nothing -> return (Unauthorized "Invalid Token")
+        Just _ -> return Authorized
 
 parseBearerToken :: Handler (Maybe Text)
 parseBearerToken = do
@@ -119,16 +139,43 @@ extractToken header =
     ("Bearer" : token : _) -> Just token
     _ -> Nothing
 
-validateJWT :: Text -> IO Bool
+requireJWTAuthId :: Handler (Key User)
+requireJWTAuthId = do
+  token <- requireBearerToken
+  claims <- liftIO (validateJWT token) >>= maybe (permissionDenied "Invalid token") return
+  return $ jwtUserId claims
+
+requireBearerToken :: Handler Text
+requireBearerToken = do
+  mToken <- parseBearerToken
+  maybe (permissionDenied "Missing Authorization header") return mToken
+
+validateJWT :: Text -> IO (Maybe JWTClaims)
 validateJWT token = do
   currentTime <- getPOSIXTime
   let secret = "your-secret-key" :: Text
       secretKey = JWT.hmacSecret secret
       verifySigner = JWT.toVerify secretKey
-  case JWT.decodeAndVerifySignature verifySigner token of
-    Nothing -> return False
-    Just verifiedToken -> do
-      let claimsSet = JWT.claims verifiedToken
-      case JWT.exp claimsSet of
-        Nothing -> return False
-        Just expTime -> return (JWT.secondsSinceEpoch expTime > currentTime)
+  return $ do
+    verifiedToken <- JWT.decodeAndVerifySignature verifySigner token
+    let claimsSet = JWT.claims verifiedToken
+        expTime = JWT.secondsSinceEpoch <$> JWT.exp claimsSet
+        JWT.ClaimsMap customClaims = JWT.unregisteredClaims claimsSet
+
+        -- Extract user_id from the claims using pattern matching
+        userId = case Map.lookup "user_id" customClaims of
+          Just (Number n) -> Just (round n) -- Convert Scientific to Integer
+          _ -> Nothing
+
+    -- Check if token is expired
+    guard $ maybe False (> currentTime) expTime
+
+    -- Get the actual userId or fail
+    actualUserId <- userId
+
+    -- Construct our claims
+    return
+      $ JWTClaims
+        { jwtUserId = toSqlKey actualUserId,
+          jwtExp = maybe 0 round expTime
+        }

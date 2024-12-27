@@ -37,6 +37,7 @@ import Database.Persist.Postgresql
 import Handler.Api.Auth
 import Handler.Api.HelloWorld
 import Handler.Api.TripRequests
+import Handler.Api.Trips
 import Handler.Home
 import Import
 import Language.Haskell.TH.Syntax (qLocation)
@@ -96,8 +97,8 @@ makeFoundation appSettings = do
 
   -- Create the database connection pool
   pool <-
-    flip runLoggingT logFunc $
-      createPostgresqlPool
+    flip runLoggingT logFunc
+      $ createPostgresqlPool
         (pgConnStr $ appDatabaseConf appSettings)
         (pgPoolSize $ appDatabaseConf appSettings)
 
@@ -141,20 +142,20 @@ makeLogWare foundation =
 -- | Warp settings for the given foundation value.
 warpSettings :: App -> Settings
 warpSettings foundation =
-  setPort (appPort $ appSettings foundation) $
-    setHost (appHost $ appSettings foundation) $
-      setOnException
-        ( \_req e ->
-            when (defaultShouldDisplayException e) $
-              messageLoggerSource
-                foundation
-                (appLogger foundation)
-                $(qLocation >>= liftLoc)
-                "yesod"
-                LevelError
-                (toLogStr $ "Exception from Warp: " ++ show e)
-        )
-        defaultSettings
+  setPort (appPort $ appSettings foundation)
+    $ setHost (appHost $ appSettings foundation)
+    $ setOnException
+      ( \_req e ->
+          when (defaultShouldDisplayException e)
+            $ messageLoggerSource
+              foundation
+              (appLogger foundation)
+              $(qLocation >>= liftLoc)
+              "yesod"
+              LevelError
+              (toLogStr $ "Exception from Warp: " ++ show e)
+      )
+      defaultSettings
 
 -- | For yesod devel, return the Warp settings and WAI Application.
 getApplicationDev :: IO (Settings, Application)

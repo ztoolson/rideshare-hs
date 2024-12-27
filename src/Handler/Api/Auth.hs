@@ -10,13 +10,14 @@ module Handler.Api.Auth where
 
 import Crypto.BCrypt (hashPasswordUsingPolicy, slowerBcryptHashingPolicy, validatePassword)
 import Data.Aeson (withObject, (.!=), (.:?))
+import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
 import Data.Time (addUTCTime)
 import Data.Time.Clock.POSIX (utcTimeToPOSIXSeconds)
 import Database.Persist.Sql (fromSqlKey)
 import Import
 import Text.Email.Validate (isValid)
-import Web.JWT as JWT (JWTClaimsSet (..), encodeSigned, hmacSecret, numericDate, stringOrURI)
+import Web.JWT as JWT (ClaimsMap (..), JWTClaimsSet (..), encodeSigned, hmacSecret, numericDate)
 
 newtype HashedPassword = HashedPassword ByteString deriving (Show)
 
@@ -31,7 +32,9 @@ data LoginRequest = LoginRequest
 instance FromJSON LoginRequest where
   parseJSON = withObject "LoginRequest" $ \v ->
     LoginRequest
-      <$> v .:? "email" .!= ""
+      <$> v
+      .:? "email"
+      .!= ""
       <*> (PlainTextPassword <$> v .:? "password" .!= "")
 
 data SignupRequest = SignupRequest
@@ -47,12 +50,21 @@ data SignupRequest = SignupRequest
 instance FromJSON SignupRequest where
   parseJSON = withObject "SignupRequest" $ \v ->
     SignupRequest
-      <$> v .:? "email" .!= ""
+      <$> v
+      .:? "email"
+      .!= ""
       <*> (PlainTextPassword <$> v .:? "password" .!= "")
-      <*> v .:? "firstName" .!= ""
-      <*> v .:? "lastName" .!= ""
-      <*> v .:? "type" .!= ""
-      <*> v .:? "driversLicenseNumber"
+      <*> v
+      .:? "firstName"
+      .!= ""
+      <*> v
+      .:? "lastName"
+      .!= ""
+      <*> v
+      .:? "type"
+      .!= ""
+      <*> v
+      .:? "driversLicenseNumber"
 
 postAuthLoginR :: Handler Value
 postAuthLoginR = do
@@ -71,8 +83,8 @@ postAuthLoginR = do
               let expTime = addUTCTime (24 * 3600) time -- token expires in 24 hours
               token <- generateJWT (fromSqlKey userId) expTime
 
-              return $
-                object
+              return
+                $ object
                   [ "token" .= token,
                     "exp" .= formatTime defaultTimeLocale "$m-$d-$Y %H:%M" expTime,
                     "userId" .= userId
@@ -96,41 +108,52 @@ postAuthSignupR = do
             Just (HashedPassword hashedPass) -> do
               currentTime <- liftIO getCurrentTime
               userId <-
-                runDB $
-                  insert $
-                    User
-                      { userEmail = signupEmail signupReq,
-                        userPasswordHash = hashedPass,
-                        userFirstName = signupFirstName signupReq,
-                        userLastName = signupLastName signupReq,
-                        userType = signupType signupReq,
-                        userCreatedAt = currentTime,
-                        userUpdatedAt = currentTime,
-                        userTripsCount = Nothing,
-                        userDriversLicenseNumber = signupDriversLicenseNumber signupReq
-                      }
+                runDB
+                  $ insert
+                  $ User
+                    { userEmail = signupEmail signupReq,
+                      userPasswordHash = hashedPass,
+                      userFirstName = signupFirstName signupReq,
+                      userLastName = signupLastName signupReq,
+                      userType = signupType signupReq,
+                      userCreatedAt = currentTime,
+                      userUpdatedAt = currentTime,
+                      userTripsCount = Nothing,
+                      userDriversLicenseNumber = signupDriversLicenseNumber signupReq
+                    }
 
               -- generate JWT token
               time <- liftIO getCurrentTime
               let expTime = addUTCTime (24 * 3600) time -- token expires in 24 hours
               token <- generateJWT (fromSqlKey userId) expTime
 
-              returnJson $
-                object
+              returnJson
+                $ object
                   [ "token" .= token,
                     "exp" .= formatTime defaultTimeLocale "$m-$d-$Y %H:%M" expTime,
                     "userId" .= userId
                   ]
 
 generateJWT :: Int64 -> UTCTime -> Handler Text
-generateJWT userId expirationTime = do
-  let secret = "your-secret-key" -- This is not secure, if you want this to be a real app then don't hard code this
-  let cs =
-        mempty
-          { JWT.sub = JWT.stringOrURI (T.pack $ show userId),
-            JWT.exp = JWT.numericDate (utcTimeToPOSIXSeconds expirationTime)
+generateJWT userId expTime = do
+  let claims =
+        JWT.JWTClaimsSet
+          { JWT.iss = Nothing,
+            JWT.sub = Nothing,
+            JWT.aud = Nothing,
+            JWT.exp = JWT.numericDate $ utcTimeToPOSIXSeconds expTime,
+            JWT.nbf = Nothing,
+            JWT.iat = Nothing,
+            JWT.jti = Nothing,
+            JWT.unregisteredClaims =
+              JWT.ClaimsMap
+                $ Map.fromList
+                  [ ("user_id", toJSON userId)
+                  ]
           }
-  return $ JWT.encodeSigned (JWT.hmacSecret secret) mempty cs
+      secret = "your-secret-key"
+      key = JWT.hmacSecret secret
+  return $ JWT.encodeSigned key mempty claims
 
 hashPassword :: PlainTextPassword -> IO (Maybe HashedPassword)
 hashPassword (PlainTextPassword pass) =

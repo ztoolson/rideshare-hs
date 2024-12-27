@@ -44,37 +44,42 @@ instance ToJSON CreateTripResponse where
 -- 2. create locations for startAddress and endAddress in location
 -- 3. assign a driver to create a trip record
 --
--- TODO: add more robust security to ensure the rider requesting the ride is the one that is auth'd in the jwt
 postCreateTripRequestsR :: Handler A.Value
 postCreateTripRequestsR = do
   payload <- requireCheckJsonBody :: Handler CreateTripRequestPayload
-  -- runDB will run all actions in a db transaction so this flow is all or nothing
-  tripReqId <- runDB $ do
-    -- Verify rider exists
-    void $ get404 (tripRequestRiderId payload)
 
-    -- Find or create locations
-    startLoc <- findOrCreateLocation (tripRequestStartAddress payload)
-    endLoc <- findOrCreateLocation (tripRequestEndAddress payload)
+  -- Check that use in auth is the same as the user in the request. TODO - maybe better to not user id from payload and only user id from auth?
+  jwtUserId <- requireJWTAuthId
+  if jwtUserId /= tripRequestRiderId payload
+    then sendStatusJSON status401 $ object ["error" .= ("Unauthorized" :: Text)]
+    else do
+      -- runDB will run all actions in a db transaction so this flow is all or nothing
+      tripReqId <- runDB $ do
+        -- Verify rider exists
+        void $ get404 (tripRequestRiderId payload)
 
-    -- Create trip request
-    now <- liftIO getCurrentTime
-    tripReqId <-
-      insert
-        TripRequest
-          { tripRequestRider = tripRequestRiderId payload,
-            tripRequestStartLocation = entityKey startLoc,
-            tripRequestEndLocation = entityKey endLoc,
-            tripRequestCreatedAt = now,
-            tripRequestUpdatedAt = now
-          }
+        -- Find or create locations
+        startLoc <- findOrCreateLocation (tripRequestStartAddress payload)
+        endLoc <- findOrCreateLocation (tripRequestEndAddress payload)
 
-    -- Create associated trip
-    void $ createTrip tripReqId
+        -- Create trip request
+        now <- liftIO getCurrentTime
+        tripReqId <-
+          insert
+            TripRequest
+              { tripRequestRider = tripRequestRiderId payload,
+                tripRequestStartLocation = entityKey startLoc,
+                tripRequestEndLocation = entityKey endLoc,
+                tripRequestCreatedAt = now,
+                tripRequestUpdatedAt = now
+              }
 
-    pure tripReqId
+        -- Create associated trip
+        void $ createTrip tripReqId
 
-  sendResponseStatus created201 $ toJSON $ CreateTripResponse tripReqId
+        pure tripReqId
+
+      sendResponseStatus created201 $ toJSON $ CreateTripResponse tripReqId
 
 -- getTripRequestR will check if the trip id exists, if it does it will return the trip request id and the associated trip id.
 getShowTripRequestR :: TripRequestId -> Handler A.Value
@@ -158,11 +163,11 @@ getTripWithRequest ::
 getTripWithRequest tripRequestId = do
   select $ do
     (tripRequest :& trip) <-
-      from
-        $ table @TripRequest
+      from $
+        table @TripRequest
           `innerJoin` table @Trip
-        `E.on` ( \(tr :& t) ->
-                   t ^. TripTripRequest E.==. tr ^. TripRequestId
-               )
+            `E.on` ( \(tr :& t) ->
+                       t ^. TripTripRequest E.==. tr ^. TripRequestId
+                   )
     where_ (tripRequest ^. TripRequestId E.==. val tripRequestId)
     pure (tripRequest, trip)
