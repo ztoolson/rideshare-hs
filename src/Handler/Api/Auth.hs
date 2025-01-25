@@ -1,8 +1,5 @@
-{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
@@ -211,14 +208,14 @@ validateNonEmptyField fieldName name
     | otherwise = Nothing
 
 validateUserType :: Text -> Maybe Text
-validateUserType userType
-    | T.null (T.strip userType) = Just "Type is required"
-    | userType `notElem` ["rider", "driver"] = Just "Type must be either 'rider' or 'driver'"
+validateUserType uType
+    | T.null (T.strip uType) = Just "Type is required"
+    | uType `notElem` ["rider", "driver"] = Just "Type must be either 'rider' or 'driver'"
     | otherwise = Nothing
 
 validateDriversLicense :: Text -> Maybe Text -> Maybe Text
-validateDriversLicense userType maybeDriversLicense =
+validateDriversLicense uType maybeDriversLicense =
     case maybeDriversLicense of
         Just dl | T.length dl > 100 -> Just "Driver's license number must be at most 100 characters"
-        Nothing | userType == "driver" -> Just "Driver's license number is required"
+        Nothing | uType == "driver" -> Just "Driver's license number is required"
         _ -> Nothing

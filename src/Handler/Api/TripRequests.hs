@@ -51,7 +51,7 @@ postCreateTripRequestsR = do
     -- runDB will run all actions in a db transaction so this flow is all or nothing
     tripReqId <- runDB $ do
         -- Verify rider exists
-        void $ get404 (jwtUserId)
+        void $ get404 jwtUserId
 
         -- Find or create locations
         startLoc <- findOrCreateLocation (tripRequestStartAddress payload)
