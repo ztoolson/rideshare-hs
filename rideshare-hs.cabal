@@ -25,6 +25,7 @@ library
       Handler.Api.Auth
       Handler.Api.HelloWorld
       Handler.Api.TripRequests
+      Handler.Api.Trips
       Handler.Home
       Import
       Import.NoFoundation

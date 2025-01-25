@@ -11,3 +11,5 @@
 
 /api/trip_requests CreateTripRequestsR POST
 /api/trip_requests/#TripRequestId ShowTripRequestR GET
+
+/api/trips/my MyTripsR GET

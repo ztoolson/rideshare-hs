@@ -189,7 +189,7 @@ validateSignupFields signupReq =
       validateNonEmptyField "First name" $ signupFirstName signupReq,
       validateNonEmptyField "Last name" $ signupLastName signupReq,
       validateNonEmptyField "Type" $ signupType signupReq,
-      validateDriversLicense $ signupDriversLicenseNumber signupReq
+      validateDriversLicense (signupType signupReq) (signupDriversLicenseNumber signupReq)
     ]
 
 validateEmail :: Text -> Maybe Text
@@ -210,8 +210,15 @@ validateNonEmptyField fieldName name
   | T.null (T.strip name) = Just $ fieldName <> " is required"
   | otherwise = Nothing
 
-validateDriversLicense :: Maybe Text -> Maybe Text
-validateDriversLicense maybeDriversLicense =
-  case maybeDriversLicense of
-    Just dl | T.length dl > 100 -> Just "Driver's license number must be at most 100 characters"
+validateUserType :: Text -> Maybe Text
+validateUserType userType
+  | T.null (T.strip userType) = Just "Type is required"
+  | userType `notElem` ["rider", "driver"] = Just "Type must be either 'rider' or 'driver'"
+  | otherwise = Nothing
+
+validateDriversLicense :: Text -> Maybe Text -> Maybe Text
+validateDriversLicense userType maybeDriversLicense =
+  case (userType, maybeDriversLicense) of
+    ("driver", Nothing) -> Just "Driver's license number is required"
+    ("driver", Just dl) | T.length dl > 100 -> Just "Driver's license number must be at most 100 characters"
     _ -> Nothing
