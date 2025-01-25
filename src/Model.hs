@@ -21,6 +21,7 @@ module Model where
 import ClassyPrelude.Yesod
 import Control.Monad (fail)
 import Data.Aeson ()
+import qualified Data.Aeson.KeyMap as KeyMap
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
 import Database.Persist.Quasi
@@ -98,3 +99,59 @@ parseDouble t = case reads (T.unpack t) of
 share
     [mkPersist sqlSettings, mkMigrate "migrateAll"]
     $(persistFileWith lowerCaseSettings "config/models.persistentmodels")
+
+instance ToJSON User where
+    toJSON user =
+        object
+            [ "email" .= userEmail user
+            , "firstName" .= userFirstName user
+            , "lastName" .= userLastName user
+            , "type" .= userType user
+            , "createdAt" .= userCreatedAt user
+            , "updatedAt" .= userUpdatedAt user
+            , "tripsCount" .= userTripsCount user
+            , "driversLicenseNumber" .= userDriversLicenseNumber user
+            ]
+
+instance ToJSON Trip where
+    toJSON trip =
+        object
+            [ "tripRequest" .= tripTripRequest trip
+            , "driver" .= tripDriver trip
+            , "completedAt" .= tripCompletedAt trip
+            , "rating" .= tripRating trip
+            , "createdAt" .= tripCreatedAt trip
+            , "updatedAt" .= tripUpdatedAt trip
+            ]
+
+instance ToJSON TripRequest where
+    toJSON req =
+        object
+            [ "rider" .= tripRequestRider req
+            , "startLocation" .= tripRequestStartLocation req
+            , "endLocation" .= tripRequestEndLocation req
+            , "createdAt" .= tripRequestCreatedAt req
+            , "updatedAt" .= tripRequestUpdatedAt req
+            ]
+
+-- Entity instances
+instance ToJSON (Entity User) where
+    toJSON (Entity userId user) = Object $
+        KeyMap.insert "id" (toJSON userId) $
+            case toJSON user of
+                Object obj -> obj
+                _ -> error "Unexpected non-object User JSON"
+
+instance ToJSON (Entity Trip) where
+    toJSON (Entity tripId trip) = Object $
+        KeyMap.insert "id" (toJSON tripId) $
+            case toJSON trip of
+                Object obj -> obj
+                _ -> error "Unexpected non-object Trip JSON"
+
+instance ToJSON (Entity TripRequest) where
+    toJSON (Entity reqId req) = Object $
+        KeyMap.insert "id" (toJSON reqId) $
+            case toJSON req of
+                Object obj -> obj
+                _ -> error "Unexpected non-object TripRequest JSON"
