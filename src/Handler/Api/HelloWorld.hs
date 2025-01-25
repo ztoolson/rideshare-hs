@@ -7,4 +7,4 @@ import Import
 
 getHelloWorldR :: Handler Value
 getHelloWorldR = do
-  return $ object ["message" .= ("Hello world!" :: Text)]
+    return $ object ["message" .= ("Hello world!" :: Text)]

@@ -10,5 +10,5 @@ import Import
 
 getHomeR :: Handler Value
 getHomeR = do
-  -- Return a hard-coded JSON message
-  returnJson $ object ["message" .= ("Welcome to Yesod" :: Text)]
+    -- Return a hard-coded JSON message
+    returnJson $ object ["message" .= ("Welcome to Yesod" :: Text)]
