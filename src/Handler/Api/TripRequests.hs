@@ -10,6 +10,7 @@ module Handler.Api.TripRequests (
 where
 
 import qualified Data.Aeson as A
+import Control.Monad.Extra (fromMaybeM)
 import Database.Esqueleto.Experimental as E
 import qualified Database.Esqueleto.PostgreSQL as EP
 import Import
@@ -94,7 +95,7 @@ getShowTripRequestR tripRequestId = do
 
 -- createTrip will find a driver and assign them to the trip request by creating a record in the trip table
 createTrip :: TripRequestId -> ReaderT SqlBackend Handler (Entity Trip)
-createTrip reqId = do
+createTrip tripReqId = do
     now <- liftIO getCurrentTime
     mDriver <- findBestAvailableDriver
     driver <- case mDriver of
@@ -105,7 +106,7 @@ createTrip reqId = do
         Just d -> return d
     insertEntity
         Trip
-            { tripTripRequest = reqId
+            { tripTripRequest = tripReqId
             , tripDriver = entityKey driver
             , tripCompletedAt = Nothing
             , tripRating = Nothing
@@ -118,20 +119,17 @@ findOrCreateLocation :: Text -> ReaderT SqlBackend Handler (Entity Location)
 findOrCreateLocation addr = do
     now <- liftIO getCurrentTime
     mLoc <- getBy $ UniqueAddress addr
-    -- TODO: this is where to make a call to geocode address if either address exists and hasn't been geocode yet or if address doesn't exist
-    case mLoc of
-        Just loc -> pure loc
-        Nothing -> do
-            let newLoc =
-                    Location
-                        { locationAddress = addr
-                        , locationCity = "Unknown"
-                        , locationState = "Unknown"
-                        , locationPosition = defaultPoint
-                        , locationCreatedAt = now
-                        , locationUpdatedAt = now
-                        }
-            insertEntity newLoc
+    fromMaybeM
+      (insertEntity
+          Location
+              { locationAddress = addr
+              , locationCity = "Unknown"
+              , locationState = "Unknown"
+              , locationPosition = defaultPoint  -- TODO: Geocode
+              , locationCreatedAt = now
+              , locationUpdatedAt = now
+              })
+      (return mLoc)
 
 -- findBestAvailableDriver will select a random driver from the user table and assign to the request
 -- TODO: if you want, this could be a place to improve the drive selection algorithm

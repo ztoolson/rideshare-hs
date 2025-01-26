@@ -45,6 +45,7 @@ dependencies:
 - transformers
 - esqueleto
 - http-types
+- extra
 
 # The library contains all of our application code. The executable
 # defined below is just a thin wrapper.

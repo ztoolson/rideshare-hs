@@ -53,6 +53,7 @@ library
     , directory >=1.1 && <1.4
     , email-validate
     , esqueleto
+    , extra
     , fast-logger >=2.2 && <3.2
     , file-embed
     , foreign-store
@@ -114,6 +115,7 @@ executable rideshare-hs
     , directory >=1.1 && <1.4
     , email-validate
     , esqueleto
+    , extra
     , fast-logger >=2.2 && <3.2
     , file-embed
     , foreign-store
@@ -181,6 +183,7 @@ test-suite rideshare-hs-test
     , directory >=1.1 && <1.4
     , email-validate
     , esqueleto
+    , extra
     , fast-logger >=2.2 && <3.2
     , file-embed
     , foreign-store

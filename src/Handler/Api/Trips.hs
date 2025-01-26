@@ -34,7 +34,7 @@ getMyTripsR :: Handler A.Value
 getMyTripsR = do
     userId <- requireJWTAuthId
     trips <- runDB $ getCompletedTripsForUser userId
-    return $ object ["trips" .=  Import.map (\(t, r, req, d) -> TripResponse t r req d) trips]
+    return $ object ["trips" .=  fmap (\(t, r, req, d) -> TripResponse t r req d) trips]
 
 getCompletedTripsForUser :: UserId -> ReaderT SqlBackend Handler [(Entity Trip, Entity User, Entity TripRequest, Maybe (Entity User))]
 getCompletedTripsForUser userId = do
