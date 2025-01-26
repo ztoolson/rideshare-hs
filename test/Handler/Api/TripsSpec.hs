@@ -27,82 +27,63 @@ spec = withApp $ do
             -- Insert rider and driver directly into database
             riderId <-
                 runDB $
-                    insert $
-                        User
-                            { userEmail = "rider@example.com"
-                            , userPasswordHash = "hashedpass"
-                            , userFirstName = "Test"
-                            , userLastName = "Rider"
-                            , userType = "rider"
-                            , userCreatedAt = time
-                            , userUpdatedAt = time
-                            , userTripsCount = Nothing
-                            , userDriversLicenseNumber = Nothing
-                            }
+                    createUser
+                        "rider@example.com"
+                        "hashedpass"
+                        "TestFirstName"
+                        "RiderLastName"
+                        "rider"
+                        time
+                        Nothing
 
             driverId <-
                 runDB $
-                    insert $
-                        User
-                            { userEmail = "driver@example.com"
-                            , userPasswordHash = "hashedpass"
-                            , userFirstName = "Test"
-                            , userLastName = "Driver"
-                            , userType = "driver"
-                            , userCreatedAt = time
-                            , userUpdatedAt = time
-                            , userTripsCount = Nothing
-                            , userDriversLicenseNumber = Just "DL123456"
-                            }
+                    createUser
+                        "driver@example.com"
+                        "hashedpass"
+                        "TestFirstname"
+                        "DriverLastName"
+                        "driver"
+                        time
+                        (Just "DL123456")
+
             -- Insert start and end locations
             startLocId <-
                 runDB $
-                    insert $
-                        Location
-                            { locationAddress = "123 Start St"
-                            , locationCity = "Unknown"
-                            , locationState = "Unknown"
-                            , locationPosition = Point 0 0
-                            , locationCreatedAt = time
-                            , locationUpdatedAt = time
-                            }
+                    createLocation
+                        "123 Start St"
+                        "UnknownCity"
+                        "UnknownState"
+                        (Point 0 0)
+                        time
 
             endLocId <-
                 runDB $
-                    insert $
-                        Location
-                            { locationAddress = "456 End Ave"
-                            , locationCity = "Unknown"
-                            , locationState = "Unknown"
-                            , locationPosition = Point 0 0
-                            , locationCreatedAt = time
-                            , locationUpdatedAt = time
-                            }
+                    createLocation
+                        "456 End Ave"
+                        "UnknownCity"
+                        "UnknownState"
+                        (Point 0 0)
+                        time
 
             -- Create trip request
             tripRequestId <-
                 runDB $
-                    insert $
-                        TripRequest
-                            { tripRequestRider = riderId
-                            , tripRequestStartLocation = startLocId
-                            , tripRequestEndLocation = endLocId
-                            , tripRequestCreatedAt = time
-                            , tripRequestUpdatedAt = time
-                            }
+                    createTripRequest
+                        riderId
+                        startLocId
+                        endLocId
+                        time
 
             -- Create completed trip
             tripId <-
                 runDB $
-                    insert $
-                        Trip
-                            { tripTripRequest = tripRequestId
-                            , tripDriver = driverId
-                            , tripCompletedAt = Just time
-                            , tripRating = Nothing
-                            , tripCreatedAt = time
-                            , tripUpdatedAt = time
-                            }
+                    createTrip
+                        tripRequestId
+                        driverId
+                        (Just time)
+                        Nothing
+                        time
 
             -- Generate auth token for rider
             token <- runHandler $ createAuthToken (fromSqlKey riderId)
@@ -125,9 +106,9 @@ spec = withApp $ do
                                             [ "createdAt" .= time
                                             , "driversLicenseNumber" .= ("DL123456" :: Text)
                                             , "email" .= ("driver@example.com" :: Text)
-                                            , "firstName" .= ("Test" :: Text)
+                                            , "firstName" .= ("TestFirstname" :: Text)
                                             , "id" .= fromSqlKey driverId
-                                            , "lastName" .= ("Driver" :: Text)
+                                            , "lastName" .= ("DriverLastName" :: Text)
                                             , "tripsCount" .= Null
                                             , "type" .= ("driver" :: Text)
                                             , "updatedAt" .= time
@@ -146,9 +127,9 @@ spec = withApp $ do
                                             [ "createdAt" .= time
                                             , "driversLicenseNumber" .= Null
                                             , "email" .= ("rider@example.com" :: Text)
-                                            , "firstName" .= ("Test" :: Text)
+                                            , "firstName" .= ("TestFirstName" :: Text)
                                             , "id" .= fromSqlKey riderId
-                                            , "lastName" .= ("Rider" :: Text)
+                                            , "lastName" .= ("RiderLastName" :: Text)
                                             , "tripsCount" .= Null
                                             , "type" .= ("rider" :: Text)
                                             , "updatedAt" .= time
@@ -174,18 +155,14 @@ spec = withApp $ do
             -- Create a rider
             riderId <-
                 runDB $
-                    insert $
-                        User
-                            { userEmail = "rider@example.com"
-                            , userPasswordHash = "hashedpass"
-                            , userFirstName = "Test"
-                            , userLastName = "Rider"
-                            , userType = "rider"
-                            , userCreatedAt = time
-                            , userUpdatedAt = time
-                            , userTripsCount = Nothing
-                            , userDriversLicenseNumber = Nothing
-                            }
+                    createUser
+                        "rider@example.com"
+                        "hashedpass"
+                        "TestFirstName"
+                        "RiderLastName"
+                        "rider"
+                        time
+                        Nothing
 
             -- Generate auth token for rider
             token <- runHandler $ createAuthToken (fromSqlKey riderId)

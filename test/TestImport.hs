@@ -79,3 +79,54 @@ getTables = do
             []
 
     return $ map unSingle tables
+
+-- Helper functions for creating test data
+createUser :: Text -> Text -> Text -> Text -> Text -> UTCTime -> Maybe Text -> SqlPersistM (Key User)
+createUser email password firstName lastName userType time mLicense =
+    insert $
+        User
+            { userEmail = email
+            , userPasswordHash = encodeUtf8 password
+            , userFirstName = firstName
+            , userLastName = lastName
+            , userType = userType
+            , userCreatedAt = time
+            , userUpdatedAt = time
+            , userTripsCount = Nothing
+            , userDriversLicenseNumber = mLicense
+            }
+
+createLocation :: Text -> Text -> Text -> Point -> UTCTime -> SqlPersistM (Key Location)
+createLocation address city state position time =
+    insert $
+        Location
+            { locationAddress = address
+            , locationCity = city
+            , locationState = state
+            , locationPosition = position
+            , locationCreatedAt = time
+            , locationUpdatedAt = time
+            }
+
+createTripRequest :: Key User -> Key Location -> Key Location -> UTCTime -> SqlPersistM (Key TripRequest)
+createTripRequest rider startLocation endLocation time =
+    insert $
+        TripRequest
+            { tripRequestRider = rider
+            , tripRequestStartLocation = startLocation
+            , tripRequestEndLocation = endLocation
+            , tripRequestCreatedAt = time
+            , tripRequestUpdatedAt = time
+            }
+
+createTrip :: Key TripRequest -> Key User -> Maybe UTCTime -> Maybe Int -> UTCTime -> SqlPersistM (Key Trip)
+createTrip tripRequest driver completedAt rating time =
+    insert $
+        Trip
+            { tripTripRequest = tripRequest
+            , tripDriver = driver
+            , tripCompletedAt = completedAt
+            , tripRating = rating
+            , tripCreatedAt = time
+            , tripUpdatedAt = time
+            }
