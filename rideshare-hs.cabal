@@ -154,6 +154,7 @@ test-suite rideshare-hs-test
       Handler.Api.AuthSpec
       Handler.Api.HelloWorldSpec
       Handler.Api.TripRequestsSpec
+      Handler.Api.TripsSpec
       Handler.HomeSpec
       ModelSpec
       TestImport
